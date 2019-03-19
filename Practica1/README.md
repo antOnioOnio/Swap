@@ -18,7 +18,7 @@ Para la realización de esta práctica se ha usado *ubuntu server 16*, esta vers
 Una vez tengamos en nuestra máquina la distribución que hayamos elegidos los primeros pasos no son complicados, por lo que vamos a pasar bastante rápido por estos puntos. Lo primero sera pinchar en el botón "nueva" y elegir un nombre para nuestra distribución, VirtualBox identificará la versión sin problemas. A continuación eligiremos el tamaño del disco virtual y la configuración básica, para la práctica se ha elegido todas las opciones por defecto. Acto seguido deberemos decirle a VirtualBox donde esta nuestro controlador, para ello cambiaremos el disco de control y seleccionaremos nuestro .iso que previamente nos hemos descargado.
 El siguiente paso será arrancar la máquina, en cierto punto de la instalación nos saldrá una pantalla en la que podremos elegir el software que deseamos instalar junto a nuestro ubuntu.
 
-![imagen](/imagenes/InstalacionLAMP_SSH.png)
+![imagen](./imagenes/InstalacionLAMP_SSH.png)
 
 Marcamos OpenSSHserver y Lamp y de este modo nuestra máquina ya vendrá instalada con ambos servicios. No obstante si por alguna razon obviamos este paso no hay problema pues podemos acceder a esta pantalla en cualquier momento con la orden
 
@@ -56,7 +56,7 @@ Para comprobar que tenemos nuestro servicio en funcionamiento ejecutamos:
 
 Si todo está correcto debería apareceros como se muestra en la imagen:
 
-![imagen](systemctlSsh.png)
+![imagen](./imagenes/systemctlSsh.png)
 
 Para acceder de una máquina a otra usaremos el comando:
 
@@ -64,7 +64,7 @@ Para acceder de una máquina a otra usaremos el comando:
  
 Donde obviamente la direccion Ip introducida es la de la máquina a la que queremos acceder y con el parametro -l indicamos el usuario.
 
-![imagen](ConexionSSH.png)
+![imagen](./imagenes/ConexionSSH.png)
 
 Podemos observar en la imagen como tras la conexion el nombre de la máquina ha cambiado de *antonio2* a *antonio*, lo que nos indica que ya estamos conectados via ssh a nuestra otra máquina.
 
@@ -81,7 +81,7 @@ Para comprobar que el servicio funciona perfectamente podemos crear un archivo h
 
     curl http://192.168.56.105/hola.html
 
-![imagen](PruebaCurl.png)
+![imagen](./imagenes/PruebaCurl.png)
 
 
 
