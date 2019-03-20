@@ -107,7 +107,7 @@ Ya hemos mencionado el uso de ssh para acceder a máquinas remotas, en este apar
 Ssh-keygen es una herramienta para la creación de un par de llaves público-privada para ssh. Este par de claves son usados para logins remotos, logins automáticos, etc.
 #### ¿LLave pública-privada?
  Para aclarar ciertas dudas que el lector pueda tener en torno al concepto de llave público-privada se intentará explicar brevemente este concepto. 
-La llave pública, como su nombre indica, es pública y todo el mundo la conoce, es visible al mundo exterior. La llave privada sin embargo la tengo que conservar con mucha seguridad pues es usada para desencriptar la información. . Cualquier cosa que yo cifre con la llave privada únicamente se puede descifrar con la llave pública y viceversa. Cualquier cosa cifrada con la llave pública sólo la puedo descifrar con la llave privada. Esto es para verificar la identidad. Si lo hago al revés se puede cifrar los documentos. Si yo cifro el documento con tu llave pública sólo tú podrás descifrarlo ya que eres el único que posee la llave privada.
+La llave pública, como su nombre indica, es pública y todo el mundo la conoce, es visible al mundo exterior. La llave privada sin embargo la tengo que conservar con mucha seguridad pues es usada para desencriptar la información. Cualquier cosa que yo cifre con la llave privada únicamente se puede descifrar con la llave pública y viceversa. Cualquier cosa cifrada con la llave pública sólo la puedo descifrar con la llave privada. Esto es para verificar la identidad. Si lo hago al revés se puede cifrar los documentos. Si yo cifro el documento con tu llave pública sólo tú podrás descifrarlo ya que eres el único que posee la llave privada.
 
 #### Parámetros
 
@@ -124,6 +124,7 @@ No obstante podemos ejecutar ssh-keygen con diferentes parámetros para modifica
   - **ed25519**   
 - **-b** -> Especificamos el tamaño de la llave.
 - **-f** -> Especificamos donde queremos guardar la llave.
+  
 Ejemplos de uso:
 ~~~~
     ssh-keygen -t rsa -b 4096
@@ -159,4 +160,50 @@ Existen varias razones por las que el proceso puede fallar:
 - Puede que intentes logearte como root y el servidor no tenga aceptado el login como root, en este caso nos iriamos al mismo archivo de configuración y chequeamos que **PermitRootLogin** este activado.
 - OpenSSH solo permite un máximo de 5 llaves configuradas automaticamente. Si queremos más debemos especificarlo mediante el comando **-i**
 
+------
+
+## Programar tareas mediante el comando cron
+
+Cron es un administrador de procesos que permite automatizar la ejecución de procesos a una hora o fecha especifica. Cron es un demonio, lo que significa que solo hay que ejecutarlo una vez y se mantendra en segundo plano ejecutando los procesos que esten en la tabla del fichero */etc/crontab*. Para ello cron visita la tabla periodicamente y chequea si hay que ejecutar algun servicio.
+Según la distribución que estemos usando cron vendrá instalado y activado o no, una rápida forma de cerciorarnos de que esté activa es mediante el comando:
+    
+    sudo systemctl status cron.service
+
+Para poder entender mejor como funciona cron, debemos entender bien la sintaxis de la tabla crontab. Las tareas cron se componen de 5 asteriscos seguidos de un campo para el usuario y un comando a ejecutar.
+
+~~~~
+  minuto hora DiaDelMes MesAño DiaSemana user command
+  * *  * * *  root  cd / &&run-parts --report /etc/cron.hourly
+~~~~
+
+* *Minuto:* indica el minuto de la hora en que el comando será ejecutado, este valor debe de estar entre 0 y 59.
+* *Hora:* indica la hora en que el comando será ejecutado, se especifica en un formato de 24 horas, los valores deben estar entre 0 y 23, 0 es medianoche.
+* *DíaDelMes:* indica el día del mes en que se quiere ejecutar el comando. Por
+ejemplo se indicaría 20, para ejecutar el comando el día 20 de cada mes.
+* *MesAño:* indica el mes en que el comando se ejecutará (1-12).
+* *DiaSemana:* indica el día de la semana en que se ejecutará el comando
+(1=lunes y hasta 7=domingo).
+* *User:* indica el usuario que ejecuta el comando.
+* *Comamnd:* indica el comando que se desea ejecutar. Este campo puede
+contener múltiples palabras y espacios.
+
+Un asterisco * como valor en los primeros cinco campos indicará el valor "todo". Así, un * en el campo de minuto indicará todos los minutos de la hora.
+
+Nuestro objetivo es mantener sincronizadas las carpetas /var/www/ de ambas máquinas, para ello previamente le habiamos dado permisos de escritura en ambas máquinas, el siguiente paso sera añadir en nuestra crontab una linea que realice la sincronización vista en el apartado anterior. El comando quedaria como sigue:
+
+    * *	* * *	antonio	rsync -avz -e ssh antonio2@192.168.56.110:/var/www/ /var/www/
+  
+Le estamos diciendo que realice la sincronización cada minuto. La tabla con la linea añadida quedaría de la siguiente manera:
+
+![tabla](imagenes/crontab.png)
+
+Después de insertar la tabla debemos recargar la configuración de crontab. Para ello ejecutamos:
+
+    sudo service cron reload
+
+Ahora basta esperar un minuto y observamos que se sincronizan perfectamente.
+
+![sincronizacion](imagenes/muestraCron.png)
+
+Como podemos observar, al minuto el archivo *pruebaCron.html* aparece en nuestro directorio.
 
