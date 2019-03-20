@@ -39,7 +39,7 @@ Si el lector esta interesado en un conocimiento más profundo de este comando pu
 Aunque SSH es un protocolo muy seguro para la transferencia de información, el gran inconveniente que nos encontramos a la hora de usarlo es mantenimiento de servidores es que estos comandos copian toda la información aunque no haya habido cambios en estos. Esto para pequeños archivos y bases de datos pequeñas puede no ser un problema, pero a la hora de escalarlo y tratas con grandes bases de datos o archivos de un peso considerable acarrearía un problema de demora. Es por ello que en estas circunstancias se usan otras herramientas de transferencia de datos de forma incremental tales como Rsync.
 
 ------
-## Rsync
+## Rsync para clonación entre máquinas
 
 Rsync es una aplicación libre para sistemas de tipo Unix y Microsoft Windows que ofrece transmisión eficiente de datos. Usa un algoritmo delta que compara los ficheros en el origen y el destino, y en caso de que se haya modificado, en lugar de copiar el fichero entero simplemente copiaría los cambios realizados respecto al destino.
 Podemos encontrar la documentación oficial, descargas de diferentes versiones del software y diferentes tutoriales en [su web oficial](http://rsync.samba.org/). 
@@ -61,11 +61,11 @@ Donde:
 * **z**-> Comprime el fichero durante la transferencia.
 * **e**-> Permite seleccionar un shell diferente para copias remotas, por defecto es SSH
 * **h**-> Permite mostras la información del proceso en un formato más entendible
-* Observamos que el destino nos viene indicado en el formato **usuario@ip:/ruta. Obviamente este proceso hará que se nos pida la contraseña una y otra vez de la máquina remota cada vez que realicemos este proceso, para agilizar más este proceso vamos a utilizar la autenticación por clave a traves de Ssh. Pero esto lo veremos en el siguiente apartado.
+* Observamos que el destino nos viene indicado en el formato *usuario@ip:/ruta*. Obviamente este proceso hará que se nos pida la contraseña una y otra vez de la máquina remota cada vez que realicemos este proceso, para agilizar más este proceso vamos a utilizar la autenticación por clave a traves de Ssh, de este modo no necesitaremos introducir contraseñas entre máquinas conocidas. Pero esto lo veremos en el siguiente apartado.
   
 El resultado lo podemos apreciar en la imagen siguiente: 
 
-![rsync](imagenes/clonacionRSYNC.png)
+![rsync](./imagenes/clonacionRSYNC.png)
 
 Como podemos apreciar, hemos clonado la carpeta situada en la máquina *antonio2* a nuestra máquina principal *antonio*, esta clonación mantiene los permisos que teníamos en nuestros archivos y con total seguridad al estar basada en ssh.
 
@@ -90,8 +90,73 @@ Un ejemplo de uso de clonación de carpetas excluyendo ciertos archivos se puede
 
     rsync -avzhP --exlude "*.conf" -e ssh usuario:IPmaquina:/var/www/ /var/www/
     
-![exclude](imagenes/ejemploExclude.png)
+![exclude](./imagenes/ejemploExclude.png)
 
 Observamos que el archivo *archivo.conf* no se ha añadido en la clonación.
 
 Como podemos observar hasta ahora, el potencial de rsync es enorme, todo usuario avanzado debe conocer esta herramienta por su versatilidad y sencillez, se realizan cosas que con otras herramientas sería muchisimo más complicado.
+
+------
+
+## Acceso sin contraseña para ssh
+
+Ya hemos mencionado el uso de ssh para acceder a máquinas remotas, en este apartado nos vamos a centrar en una herramienta que trae instalada por defecto y el uso que se le puede dar en la práctica.
+
+### Ssh-keygen
+
+Ssh-keygen es una herramienta para la creación de un par de llaves público-privada para ssh. Este par de claves son usados para logins remotos, logins automáticos, etc.
+#### ¿LLave pública-privada?
+ Para aclarar ciertas dudas que el lector pueda tener en torno al concepto de llave público-privada se intentará explicar brevemente este concepto. 
+La llave pública, como su nombre indica, es pública y todo el mundo la conoce, es visible al mundo exterior. La llave privada sin embargo la tengo que conservar con mucha seguridad pues es usada para desencriptar la información. . Cualquier cosa que yo cifre con la llave privada únicamente se puede descifrar con la llave pública y viceversa. Cualquier cosa cifrada con la llave pública sólo la puedo descifrar con la llave privada. Esto es para verificar la identidad. Si lo hago al revés se puede cifrar los documentos. Si yo cifro el documento con tu llave pública sólo tú podrás descifrarlo ya que eres el único que posee la llave privada.
+
+#### Parámetros
+
+La forma más sencilla de generar el par de llaves es simplemente ejecutando **ssh-keygen**
+sin argumentos, como vemos en la imagen:
+![ssh-keygen](./imagenes/ssh-keygen&#32;simple.png)
+
+Observamos que nos realiza una serie de preguntas, el directorio donde guardar las contraseñas,por defecto las guarda en .ssh en el directorio home del usuario. Si queremos que se nos conecte sin contraseña debemos dejar el campo paraphrase en blanco, este campo se utiliza para añadir aún mas seguridad a la clave privada.
+No obstante podemos ejecutar ssh-keygen con diferentes parámetros para modificar la creación de las llaves. 
+- **-t** -> Especificamos el tipo de algoritmo con el que queremos encriptar nuestras llaves, tenemos varias opciones:
+  - **rsa**
+  - **dsa**
+  - **ecdsa**
+  - **ed25519**   
+- **-b** -> Especificamos el tamaño de la llave.
+- **-f** -> Especificamos donde queremos guardar la llave.
+Ejemplos de uso:
+~~~~
+    ssh-keygen -t rsa -b 4096
+    ssh-keygen -t dsa
+    ssh-keygen -t ecdsa -b 521
+    ssh-keygen -t ed25519
+    ssh-keygen -f ~/home/antonio -t ecdsa -b 1024
+~~~~
+
+#### Copiar las llaves
+
+Para copiar nuestras llaves de una máquina a otra ssh dispone de un comando muy simple, *ssh-copy-id usuario@ipmaquina*, en el ejemplo que nos toca se ha ejecutado de la siguiente manera:
+
+![sshSin](./imagenes/sshSinContraseña.png)
+
+Como podemos observar en la imagen, se han realizado los dos ultimos pasos:
+- Instalación de las llaves en la máquina remota con el comando:
+    ~~~~
+    ssh-copy-id antonio2@192.168.56.110
+    ~~~~  
+- Acceso remoto sin contraseña desde *antonio* a *antonio2* con el comando:
+  
+    ~~~~
+    ssh antonio2@192.168.56.110
+    ~~~~  
+
+Se ha realizado el proceso inverso también para facilitar futuros trámites entre máquinas.
+
+#### Posibles problemas
+
+Existen varias razones por las que el proceso puede fallar:
+- El servidor puede estar configurado para no aceptar autenticacion de clave pública, en este caso nos deberiamos asegurar en */etc/ssh/sshd_config* que la linea **PubkeyAuthentication** esta puesta en yes.
+- Puede que intentes logearte como root y el servidor no tenga aceptado el login como root, en este caso nos iriamos al mismo archivo de configuración y chequeamos que **PermitRootLogin** este activado.
+- OpenSSH solo permite un máximo de 5 llaves configuradas automaticamente. Si queremos más debemos especificarlo mediante el comando **-i**
+
+
