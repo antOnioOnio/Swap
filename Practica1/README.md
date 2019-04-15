@@ -48,7 +48,7 @@ O simplemente reiniciar la máquina.
 En nuestra segunda máquina deberemos realizar el mismo proceso, pero obviamente indicandole otra Ip diferente que este dentro de la misma red. En mi caso a la primera máquina se le ha asignado la direccion 192.168.56.105 y a la segunda 192.168.56.110.
 
 ## Conseguir conectividad entre ambas máquinas con SSH y Curl
-###SSH
+### SSH
 La configuración del servicio ssh se puede hacer desde el archivo */etc/ssh/sshd_config* ,aqui se pueden modificar opciones tales como el puerto de escucha del servicio, prohibir acceso a ciertos usuarios etc. No obstante y por la claridad de la práctica se van a dejar las opciones por defecto. 
 Para comprobar que tenemos nuestro servicio en funcionamiento ejecutamos:
 
@@ -68,7 +68,7 @@ Donde obviamente la direccion Ip introducida es la de la máquina a la que quere
 
 Podemos observar en la imagen como tras la conexion el nombre de la máquina ha cambiado de *antonio2* a *antonio*, lo que nos indica que ya estamos conectados via ssh a nuestra otra máquina.
 
-###Curl
+### Curl
 
 La instalación de este servicio es muy sencilla, basta con escribir los siguientes comandos.
 
