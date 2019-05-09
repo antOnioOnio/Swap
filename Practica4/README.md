@@ -121,4 +121,24 @@ Nosotros deberemos configurar el cortafuegos de una de las máquinas, para ello 
     iptables -A INPUT -p tcp --dport 443 -j ACCEPT
     iptables -A OUTPUT -p tcp --sport 443 -j ACCEPT
 
-    
+### Ejecutando Script
+
+Para que el script creado se nos ejecute siempre al inicio del sistema tenemos varias opciones. Para la realización de la práctica se ha optado por utilizar el archivo "rc.local" localizado en '/etc'. Haremos una entrada para ejecutar el script en el archivo.
+El primer paso que debemos realizar es darle permisos de escritura al archivo.
+
+    sudo chmod +x /etc/rc.local
+
+A continuación agregamos el script que se ejecutará y escribimos en la última linea el siguiente comando
+
+    sh /root/script.sh &
+
+El archivo debe quedar como se muestra a continuación.
+
+![imagenTablas](./imagenes/iptablesRes.png)
+
+Reiniciamos y comprobamos que efectivamente nuestras tablas se han creado correctamente.
+
+
+![iptablespruf](./imagenes/iptablesPru.png)
+
+
