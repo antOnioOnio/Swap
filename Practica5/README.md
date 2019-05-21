@@ -19,6 +19,7 @@ Para la creación de la base de datos se han utilizado los siguientes comandos.
     mysql> create table datos(nombre varchar(100),tlf int);
     mysql> insert into datos(nombre,tlf) values ("pepe",958227700);
 
+
 Con estas sentencias ya tenemos creada nuestra tabla con una tupla insertada. 
 
 ![bd](./imagenes/bd.png)
@@ -157,3 +158,12 @@ Para asegurarnos de que todo funciona bien y que maestro y esclavo esta comunica
     mysql> SHOW SLAVE STATUS\G
 
 ![bd](./imagenes/slaveStatus.png)
+
+El valor que nos dice si todo va bien sera el de la variable "seconds_behind_master"
+Este valor tiene que ser diferente de null. Si es así, significa que todo funciona bien.
+
+### Comprobación
+
+Para comprobar que las bases de datos se sincronizan perfectamente, nos vamos a nuestra máquina principal e introducimos algunos datos a nuestra tabla. Como podemos observar en la imagen, estas estan perfectamente sincronizadas.
+
+![pruebaBD](./imagenes/pruebaBD.png)
